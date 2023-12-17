@@ -261,7 +261,7 @@ Number,Digimon,Stage,Type,Attribute,Memory,Equip Slots,Lv 50 HP,Lv50 SP,Lv50 Atk
 249,Rosemon BM,Mega,Data,Plant,20,2,1480,143,149,139,159,143
 '''
 
-@task(task_id="download the data")
+@task(task_id="download_the_data")
 def download_data_task():
     # TODO this is using hardcoded-data instead of a download
     with open('/usr/local/tmp/data.csv', 'w') as f:
