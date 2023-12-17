@@ -1,5 +1,6 @@
 import datetime
 import time
+import os
 
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
@@ -287,7 +288,7 @@ def download_data_task():
 @task(task_id="clean_and_split_the_data")
 def prepare_data_task():
     # TODO dummy imeplemntation
-    with open('/usr/local/tmp/data.csv', 'r') as raw_data, open('/usr/local/tmp/trai_data.csv', 'w') as train_data, open('/usr/local/tmp/test_data.csv', 'w') as test_data:
+    with open('/usr/local/tmp/data.csv', 'r') as raw_data, open('/usr/local/tmp/train_data.csv', 'w') as train_data, open('/usr/local/tmp/test_data.csv', 'w') as test_data:
         raw_data_content = raw_data.read()
         train_data.write(raw_data_content)
         test_data.write(raw_data_content)
@@ -313,22 +314,25 @@ def evaluate_model(model):
     time.sleep(3)
 
 @task(task_id="log_result")
-def log_result(model):
+def log_result():
     # TODO implement
     time.sleep(3)
 
 @task(task_id="save_result")
-def save_result(model):
+def save_result():
     # TODO implement
     time.sleep(3)
 
 @task(task_id="cleanup")
-def cleanup(model):
-    # TODO implement
-    time.sleep(3)
+def cleanup():
+    # current implementation wipes the whole persistant volume
+    for subdir, dirs, files in os.walk('/usr/local/tmp'):
+        for file in files:
+            filepath = subdir + os.sep + file
+            os.remove(filepath)
 
 with DAG(
-    dag_id="my_dag_name1",
+    dag_id="main_dag",
     start_date=datetime.datetime(2021, 1, 1),
     schedule_interval=None,
 ):
@@ -351,4 +355,31 @@ with DAG(
     log_task >> cleanup_task
     save_task >> cleanup_task
 
+with DAG(
+    dag_id="main_dag_no_cleanup",
+    start_date=datetime.datetime(2021, 1, 1),
+    schedule_interval=None,
+):
+    download_task = download_data_task()
+    prepare_task = prepare_data_task()
+    train_task1 = train_model_one()
+    train_task2 = train_model_two()
+    train_task3 = train_model_three()
+    evaluate_task1 = evaluate_model(1)
+    evaluate_task2 = evaluate_model(1)
+    evaluate_task3 = evaluate_model(1)
+    log_task = log_result()
+    save_task = save_result()
+ 
+    download_task >> prepare_task >> [ train_task1, train_task2, train_task3 ]
+    train_task1 >> evaluate_task1 >> [ log_task, save_task ]
+    train_task2 >> evaluate_task2 >> [ log_task, save_task ]
+    train_task3 >> evaluate_task3 >> [ log_task, save_task ]
 
+with DAG(
+    dag_id="cleanup_only",
+    start_date=datetime.datetime(2021, 1, 1),
+    schedule_interval=None,
+):
+    cleanup_task = cleanup()
+    cleanup_task
