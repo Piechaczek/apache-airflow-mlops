@@ -301,7 +301,7 @@ def train_model_one():
 with DAG(
     dag_id="my_dag_name1",
     start_date=datetime.datetime(2021, 1, 1),
-    schedule="@daily",
+    schedule_interval=None,
 ):
     download_task = download_data_task()
     prepare_task = prepare_data_task()
