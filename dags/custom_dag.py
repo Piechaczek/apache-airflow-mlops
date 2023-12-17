@@ -292,11 +292,40 @@ def prepare_data_task():
         train_data.write(raw_data_content)
         test_data.write(raw_data_content)
 
-@task(task_id="clean_and_split_the_data")
+@task(task_id="train_model_1")
 def train_model_one():
     # TODO implement
     time.sleep(3)
 
+@task(task_id="train_model_2")
+def train_model_two():
+    # TODO implement
+    time.sleep(3)
+
+@task(task_id="train_model_3")
+def train_model_three():
+    # TODO implement
+    time.sleep(3)
+
+@task(task_id="evaluate_model")
+def evaluate_model(model):
+    # TODO implement
+    time.sleep(3)
+
+@task(task_id="log_result")
+def log_result(model):
+    # TODO implement
+    time.sleep(3)
+
+@task(task_id="save_result")
+def save_result(model):
+    # TODO implement
+    time.sleep(3)
+
+@task(task_id="cleanup")
+def cleanup(model):
+    # TODO implement
+    time.sleep(3)
 
 with DAG(
     dag_id="my_dag_name1",
@@ -305,4 +334,21 @@ with DAG(
 ):
     download_task = download_data_task()
     prepare_task = prepare_data_task()
-    download_task >> prepare_task
+    train_task1 = train_model_one()
+    train_task2 = train_model_two()
+    train_task3 = train_model_three()
+    evaluate_task1 = evaluate_model(1)
+    evaluate_task2 = evaluate_model(1)
+    evaluate_task3 = evaluate_model(1)
+    log_task = log_result()
+    save_task = save_result()
+    cleanup_task = cleanup()
+    
+    download_task >> prepare_task >> [ train_task1, train_task2, train_task3 ]
+    train_task1 >> evaluate_task1 >> [ log_task, save_task ]
+    train_task2 >> evaluate_task2 >> [ log_task, save_task ]
+    train_task3 >> evaluate_task3 >> [ log_task, save_task ]
+    log_task >> cleanup_task
+    save_task >> cleanup_task
+
+
