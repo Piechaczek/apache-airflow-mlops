@@ -6,10 +6,8 @@ from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.decorators import task
 
-kaggle_json = None
-
 @task(task_id="download the data")
-def download_kaggle_data_task():
+def download_kaggle_data_task(kaggle_json):
     os.environ["KAGGLE_USERNAME"] = kaggle_json['username']
     os.environ["KAGGLE_KEY"] = kaggle_json['key']
 
@@ -26,20 +24,15 @@ def download_kaggle_data_task():
     kaggle.api.dataset_download_files('rtatman/digidb', path='/usr/local/tmp/data/', unzip=True)
 
 
-def main():
-    global kaggle_json
+with DAG(
+    dag_id="my_dag_name",
+    start_date=datetime.datetime(2021, 1, 1),
+    schedule="@daily",
+):
+    kaggle_json = None
     with open('./kaggle.json') as f:
         kaggle_json = json.load(f)
 
-    with DAG(
-        dag_id="my_dag_name",
-        start_date=datetime.datetime(2021, 1, 1),
-        schedule="@daily",
-    ):
-        download_task = download_kaggle_data_task()
-        dummy_task = EmptyOperator(task_id="Dummy task")
-        download_task >> dummy_task
-
-
-if '__name__' == '__main__':
-    main()
+    download_task = download_kaggle_data_task(kaggle_json)
+    dummy_task = EmptyOperator(task_id="Dummy task")
+    download_task >> dummy_task
