@@ -37,6 +37,8 @@ def main():
         schedule="@daily",
     ):
         download_task = download_kaggle_data_task()
+        dummy_task = EmptyOperator(task_id="Dummy task")
+        download_task >> dummy_task
 
 
 if '__name__' == '__main__':
