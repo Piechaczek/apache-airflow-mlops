@@ -261,7 +261,7 @@ rbac:
 
 # Airflow executor
 # One of: LocalExecutor, LocalKubernetesExecutor, CeleryExecutor, KubernetesExecutor, CeleryKubernetesExecutor
-executor: "KubernetesExecutor"  # CUSTOM CHANGE, was CeleryExecutor
+executor: "CeleryExecutor"  # CUSTOM CHANGE, default CeleryExecutor, can be KubernetesExecutor
 
 # If this is true and using LocalExecutor/KubernetesExecutor/CeleryKubernetesExecutor, the scheduler's
 # service account will have access to communicate with the api-server and launch pods.
@@ -281,9 +281,11 @@ volumes:
   persistentVolumeClaim:
     claimName: my-existing-pvc
 # VolumeMounts for all airflow containers
-volume_mounts:
+volumeMounts:
 - name: my-volume
   mountPath: "/usr/local/tmp"
+
+
 # Secrets for all airflow containers
 secret: []
 # - envName: ""
@@ -490,7 +492,7 @@ kerberos:
 # Airflow Worker Config
 workers:
   # Number of airflow celery workers in StatefulSet
-  replicas: 1
+  replicas: 3 # CUSTOM CHANGE, default is 1
   # Max number of old replicasets to retain
   revisionHistoryLimit: ~
 

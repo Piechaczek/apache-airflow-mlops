@@ -1,6 +1,5 @@
 import datetime
-import json
-import os
+import time
 
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
@@ -261,11 +260,42 @@ Number,Digimon,Stage,Type,Attribute,Memory,Equip Slots,Lv 50 HP,Lv50 SP,Lv50 Atk
 249,Rosemon BM,Mega,Data,Plant,20,2,1480,143,149,139,159,143
 '''
 
+# TODO try:  executor_config={"KubernetesExecutor": {
+                            #       "image": "airflow:runner2",
+                            #       "volume_mounts": [
+                            #           {
+                            #               "name": "airflow-dags",
+                            #               "mountPath": "/usr/local/airflow/libs",
+                            #               "subPath": "airflow/development/libs"
+                            #           },
+                            #           {
+                            #               "name": "airflow-dags",
+                            #               "mountPath": "/usr/local/airflow/plugins",
+                            #               "subPath": "airflow/development/plugins"
+                            #           }],
+                            #       }
+                            #  },
+# inside the @task decorator
+
+
 @task(task_id="download_the_data")
 def download_data_task():
     # TODO this is using hardcoded-data instead of a download
     with open('/usr/local/tmp/data.csv', 'w') as f:
         f.write(sample_data)
+
+@task(task_id="clean_and_split_the_data")
+def prepare_data_task():
+    # TODO dummy imeplemntation
+    with open('/usr/local/tmp/data.csv', 'r') as raw_data, open('/usr/local/tmp/trai_data.csv', 'w') as train_data, open('/usr/local/tmp/test_data.csv', 'w') as test_data:
+        raw_data_content = raw_data.read()
+        train_data.write(raw_data_content)
+        test_data.write(raw_data_content)
+
+@task(task_id="clean_and_split_the_data")
+def train_model_one():
+    # TODO implement
+    time.sleep(3)
 
 
 with DAG(
@@ -274,5 +304,5 @@ with DAG(
     schedule="@daily",
 ):
     download_task = download_data_task()
-    dummy_task = EmptyOperator(task_id="Dummy_task")
-    download_task >> dummy_task
+    prepare_task = prepare_data_task()
+    download_task >> prepare_task
