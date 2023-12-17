@@ -269,14 +269,10 @@ def download_data_task():
 
 
 with DAG(
-    dag_id="my_dag_name",
+    dag_id="my_dag_name1",
     start_date=datetime.datetime(2021, 1, 1),
     schedule="@daily",
 ):
-    kaggle_json = None
-    with open('./kaggle.json') as f:
-        kaggle_json = json.load(f)
-
     download_task = download_data_task()
     dummy_task = EmptyOperator(task_id="Dummy task")
     download_task >> dummy_task
