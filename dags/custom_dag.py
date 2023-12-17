@@ -274,5 +274,5 @@ with DAG(
     schedule="@daily",
 ):
     download_task = download_data_task()
-    dummy_task = EmptyOperator(task_id="Dummy task")
+    dummy_task = EmptyOperator(task_id="Dummy_task")
     download_task >> dummy_task
