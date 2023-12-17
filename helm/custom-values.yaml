@@ -2368,7 +2368,7 @@ dags:
     # git repo clone url
     # ssh example: git@github.com:apache/airflow.git
     # https example: https://github.com/apache/airflow.git
-    repo: https://github.com/filipio/apache-airflow-mlops # CUSTOM CHANGE
+    repo: https://github.com/Piechaczek/apache-airflow-mlops # CUSTOM CHANGE
     branch: wojtek # CUSTOM CHANGE
     rev: HEAD
     depth: 1
